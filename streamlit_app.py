@@ -64,9 +64,9 @@ def run():
         "Topstep": {
             "Eval Acct Cost": 149,
             "Funded Acct Setup Cost": 149,
-            "Per Side Trade Cost": 2,
+            "Per Side Trade Cost": 0,
             "Trade Entry Slippage": 0,
-            "Trade Stop Slippage": 10,
+            "Trade Stop Slippage": 0,
             "Monthly Funded Account Cost": 0
         }
     }
@@ -81,9 +81,9 @@ def run():
                                       value=cost_fee_preset[selected_fee_preset]["Funded Acct Setup Cost"], step=1)
         per_side_cost = st.number_input("Enter Per Side Trade Cost",
                                         value=cost_fee_preset[selected_fee_preset]["Per Side Trade Cost"])
-        trade_entry_slippage = st.number_input("Enter Trade Entry Slippage Estimate",
+        trade_entry_slippage = st.number_input("Enter Trade Entry Slippage Estimate in Currency",
                                                value=cost_fee_preset[selected_fee_preset]["Trade Entry Slippage"])
-        trade_stop_slippage = st.number_input("Enter Stop Loss Slippage Estimate",
+        trade_stop_slippage = st.number_input("Enter Stop Loss Slippage Estimate in Currency",
                                               value=cost_fee_preset[selected_fee_preset]["Trade Stop Slippage"])
         monthly_cost = st.number_input("Enter Monthly Funded Account Cost",
                                        value=cost_fee_preset[selected_fee_preset]["Monthly Funded Account Cost"])
