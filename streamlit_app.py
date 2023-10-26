@@ -122,7 +122,7 @@ def run():
                              acct_rules=account_rule_presets[selected_acct_preset], acct_fees=fees)
             sim.run()
             result = sim.sim_results()
-            status_message.markdown(f"### {result}")
+            status_message.markdown(f"{result}")
         else:
             st.warning("Please provide all input values before computing.")
 
