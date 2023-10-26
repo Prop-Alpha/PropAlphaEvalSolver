@@ -96,13 +96,13 @@ def run():
             "Trade Stop Slippage": trade_stop_slippage,
             "Monthly Funded Account Cost": monthly_cost
         }
-        stop_width = st.number_input("Enter Stop Size in Currency", value=3000.0, step=10)
-        tp_width = st.number_input("Enter Take Profit Size in Currency", value=3000.0, step=10)
-        win_pct = st.number_input("Enter Estimated Win Percent", value=50.0, step=1.0)
+        stop_width = st.number_input("Enter Stop Size in Currency", value=3000.0)
+        tp_width = st.number_input("Enter Take Profit Size in Currency", value=3000.0)
+        win_pct = st.number_input("Enter Estimated Win Percent", value=50.0)
         mfe = st.number_input("Enter Estimated MFE (of Losing Trades) in Currency", value=500)
-        trades_per_day = st.number_input("Enter Number of Trades Per Day", value=0, step=1)
+        trades_per_day = st.number_input("Enter Number of Trades Per Day", value=3)
         win_pct /= 100
-        monte_carlo_runs = st.number_input("Enter Number of Runs in Simulation", value=20000, step=1)
+        monte_carlo_runs = st.number_input("Enter Number of Runs in Simulation", value=20000)
 
     compute_button = st.button("Compute Estimated Probability")
 
