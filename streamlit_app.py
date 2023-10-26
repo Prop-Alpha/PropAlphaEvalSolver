@@ -7,6 +7,26 @@ from simulation import Simulation
 from trading_strategies import TradingStrategy
 
 
+def convert_to_markdown(text):
+    markdown = ''
+    lines = text.split('\n')
+
+    for line in lines:
+        if line.startswith('#'):
+            level = line.count('#')
+            markdown += f"{'#' * level} {line[level:].strip()}\n"
+        elif line.startswith('* '):
+            markdown += f"- {line[2:]}\n"
+        elif line.startswith('1. '):
+            markdown += f"1. {line[3:]}\n"
+        elif line.startswith('> '):
+            markdown += f"> {line[2:]}\n"
+        else:
+            markdown += line + '\n'
+
+    return markdown
+
+
 def run():
     image = Image.open('propalpha_logo.png')
 
@@ -122,6 +142,7 @@ def run():
                              acct_rules=account_rule_presets[selected_acct_preset], acct_fees=fees)
             sim.run()
             result = sim.sim_results()
+            result = convert_to_markdown(result)
             status_message.markdown(result)
         else:
             st.warning("Please provide all input values before computing.")
