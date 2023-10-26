@@ -1,22 +1,10 @@
-# This based on calculator from https://github.com/Prop-Alpha/PropAlphaEvalCalculator
+# this is an adaptation of Vespatrades's work here:
+# https://github.com/vespatrades/PropAlphaEvalCalculator_Streamlit/blob/master/streamlit_app.py
 
-import math
 import streamlit as st
-from winloss_graph import WinLossDiGraph
 from PIL import Image
-
-def calculate_probability(trailing_dd, account_target, stop_width, tp_width, win_pct):
-    num_loss = math.ceil(trailing_dd / stop_width)
-    num_win = math.ceil(account_target / stop_width)
-    rr_ratio = round(tp_width / stop_width, 1)
-    win_frac = win_pct / 100.0
-
-    wldg = WinLossDiGraph()
-    wldg.build_graph_from_start_node_and_params(win_frac, rr_ratio, num_win, num_loss)
-    wldg.generate_adj_matrix()
-    win_prob = wldg.get_win_prob_from_start_node() * 100
-
-    return f"Estimated Probability of Success: {win_prob:.1f}%"
+from simulation import Simulation
+from trading_strategies import TradingStrategy
 
 
 def run():
@@ -31,45 +19,93 @@ def run():
     with col3:
         st.write("")
 
-
-    st.title("Prop Alpha Eval Calculator")
+    st.title("Prop Alpha Eval Solver")
 
     st.markdown("""
-        Estimate odds of passing a prop eval with trailing drawdown given a single setup with a defined bracket and win percentage.\n
-        Costs ignored.\n
-        NOT FINANCIAL ADVICE. DO YOUR OWN RESEARCH. NO GUARANTEE OUR MATH IS CORRECT.\n
-        RISK DISCLAIMER: [Read Here](https://www.prop-alpha.com/disclaimer)\n
+        Estimate expected value of a full payout in prop accounts with EOD trailing drawdown \n
+        given a single setup with a defined bracket and known win percentage and average mfe.\n
+        NOT FINANCIAL ADVICE. \n
+        DO YOUR OWN RESEARCH. \n
+        NO GUARANTEE OUR MATH IS CORRECT. \n
+        RISK DISCLAIMER: https://www.prop-alpha.com/disclaimer
     """)
 
-    presets = {
-        # Based on info from
-        # https://support.apextraderfunding.com/hc/en-us/articles/4408610260507-How-Does-The-Trailing-Threshold-Work-Master-Course
-        "Custom": {"trailing_dd": 0.0, "account_target": 0.0},
-        "Apex 25k": {"trailing_dd": 1500.0, "account_target": 1500.0},
-        "Apex 50k": {"trailing_dd": 2500.0, "account_target": 3000.0},
-        "Apex 75k": {"trailing_dd": 2750.0, "account_target": 4250.0},
-        "Apex 100k": {"trailing_dd": 3000.0, "account_target": 6000.0},
-        "Apex 150k": {"trailing_dd": 5000.0, "account_target": 9000.0},
-        "Apex 250k": {"trailing_dd": 6500.0, "account_target": 15000.0},
-        "Apex 300k": {"trailing_dd": 7500.0, "account_target": 20000.0}
+    account_rule_presets = {
+        "Topstep 50k": {'Initial Balance (Eval)': 50000, 'Initial Balance (Funded)': 50000, 'Max Loss (Eval)': 2000,
+                        'Max Loss (Funded)': 2000, 'Funding Target Balance': 53000,
+                        'Unshared Winning Balance (Funded)': 60000,
+                        'Profit Share Fraction': .9, 'Winning Day PnL Minimum': 200, 'Maximum Daily Loss': 1000,
+                        'Maximum Daily Win': 1500, 'Minimum Winning Days for Payout': 30,
+                        'Minimum Winning Balance': 60000
+                        },
+        "Topstep 100k": {'Initial Balance (Eval)': 100000, 'Initial Balance (Funded)': 100000, 'Max Loss (Eval)': 3000,
+                         'Max Loss (Funded)': 3000, 'Funding Target Balance': 106000,
+                         'Unshared Winning Balance (Funded)': 110000,
+                         'Profit Share Fraction': .9, 'Winning Day PnL Minimum': 200, 'Maximum Daily Loss': 2000,
+                         'Maximum Daily Win': 4500, 'Minimum Winning Days for Payout': 30,
+                         'Minimum Winning Balance': 110000
+                         },
+        "Topstep 150k": {'Initial Balance (Eval)': 150000, 'Initial Balance (Funded)': 150000, 'Max Loss (Eval)': 4500,
+                         'Max Loss (Funded)': 4500, 'Funding Target Balance': 159000,
+                         'Unshared Winning Balance (Funded)': 160000,
+                         'Profit Share Fraction': .9, 'Winning Day PnL Minimum': 200, 'Maximum Daily Loss': 3000,
+                         'Maximum Daily Win': 4500, 'Minimum Winning Days for Payout': 30,
+                         'Minimum Winning Balance': 160000
+                         }
+    }
+    cost_fee_preset = {
+        "Custom": {
+            "Eval Acct Cost": 0,
+            "Funded Acct Setup Cost": 0,
+            "Per Side Trade Cost": 0,
+            "Trade Entry Slippage": 0,
+            "Trade Stop Slippage": 0,
+            "Monthly Funded Account Cost": 0
+        },
+        "Topstep": {
+            "Eval Acct Cost": 149,
+            "Funded Acct Setup Cost": 149,
+            "Per Side Trade Cost": 2,
+            "Trade Entry Slippage": 0,
+            "Trade Stop Slippage": 10,
+            "Monthly Funded Account Cost": 0
+        }
     }
 
-    selected_preset = st.selectbox("Choose a preset or select Custom:", list(presets.keys()))
+    selected_acct_preset = st.selectbox("Choose an account preset:", list(account_rule_presets.keys()))
+    selected_fee_preset = st.selectbox("Choose a cost/fee preset or select Custom:", list(cost_fee_preset.keys()))
 
     with st.container():
-        trailing_dd = st.number_input(
-            "Enter Trailing Drawdown Amount in Currency",
-            value=presets[selected_preset]["trailing_dd"],
-            step=100.0
-        )
-        account_target = st.number_input(
-            "Enter Account Target Amount in Currency",
-            value=presets[selected_preset]["account_target"],
-            step=100.0
-        )
-        stop_width = st.number_input("Enter Stop Size in Currency", value=100.0, step=100.0)
-        tp_width = st.number_input("Enter Take Profit Size in Currency", value=0.0, step=100.0)
-        win_pct = st.number_input("Enter Estimated Win Percent", value=0.0)
+        eval_cost = st.number_input("Enter Eval Account Cost",
+                                    value=cost_fee_preset[selected_fee_preset]["Eval Acct Cost"], step=1)
+        funded_cost = st.number_input("Enter Funded Account Setup Cost",
+                                      value=cost_fee_preset[selected_fee_preset]["Funded Acct Setup Cost"], step=1)
+        per_side_cost = st.number_input("Enter Per Side Trade Cost",
+                                        value=cost_fee_preset[selected_fee_preset]["Per Side Trade Cost"], step=.01)
+        trade_entry_slippage = st.number_input("Enter Trade Entry Slippage Estimate",
+                                               value=cost_fee_preset[selected_fee_preset]["Trade Entry Slippage"],
+                                               step=.01)
+        trade_stop_slippage = st.number_input("Enter Stop Loss Slippage Estimate",
+                                              value=cost_fee_preset[selected_fee_preset]["Trade Stop Slippage"],
+                                              step=.01)
+        monthly_cost = st.number_input("Enter Monthly Funded Account Cost",
+                                       value=cost_fee_preset[selected_fee_preset]["Monthly Funded Account Cost"],
+                                       step=.01)
+        fees = {
+            "Eval Acct Cost": eval_cost,
+            "Funded Acct Setup Cost": funded_cost,
+            "Per Side Trade Cost": per_side_cost,
+            "Trade Entry Slippage": trade_entry_slippage,
+            "Trade Stop Slippage": trade_stop_slippage,
+            "Monthly Funded Account Cost": monthly_cost
+        }
+        stop_width = st.number_input("Enter Stop Size in Currency", value=3000.0, step=10)
+        tp_width = st.number_input("Enter Take Profit Size in Currency", value=3000.0, step=10)
+        win_pct = st.number_input("Enter Estimated Win Percent", value=50.0, step=1.0)
+        mfe = st.number_input("Enter Estimated MFE (of Losing Trades) in Currency", value=500)
+        trades_per_day = st.number_input("Enter Number of Trades Per Day", value=0, step=1)
+        win_pct /= 100
+        monte_carlo_runs = st.number_input("Enter Number of Runs in Simulation", value=20000, step=1)
 
     compute_button = st.button("Compute Estimated Probability")
 
@@ -78,12 +114,17 @@ def run():
         # Reserve a spot for our status message
         status_message = st.empty()
 
-        # We can further check if all input fields are provided, although it's not strictly necessary since there are default values.
-        if all([trailing_dd, account_target, stop_width, tp_width, win_pct]):
+        # We can further check if all input fields are provided, although it's not strictly necessary since there are
+        # default values.
+        if all([trades_per_day, stop_width, tp_width, win_pct]):
             # Display a message saying the computation is running
             status_message.text("Computing... Please wait.")
-
-            result = calculate_probability(trailing_dd, account_target, stop_width, tp_width, win_pct)
+            strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
+                                       stop_width=stop_width, tp_width=tp_width)
+            sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
+                             acct_rules=account_rule_presets[selected_acct_preset], acct_fees=fees)
+            sim.run()
+            result = sim.sim_results()
             status_message.markdown(f"### {result}")
         else:
             st.warning("Please provide all input values before computing.")

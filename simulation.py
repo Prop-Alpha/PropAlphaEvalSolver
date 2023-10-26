@@ -1,8 +1,6 @@
 import numpy as np
 
-from account_models import TopstepAccount
 from trader import Trader
-from trading_strategies import TradingStrategy
 
 
 # import matplotlib.pyplot as plt
@@ -15,7 +13,7 @@ class Simulation:
         self.winning_trader_numbers = []
         self.strategy = trading_strat
         self.num_traders = num_traders
-        trader_array = [Trader(strategy, acct_rules=acct_rules, acct_fees=acct_fees) for i in range(num_traders)]
+        trader_array = [Trader(self.strategy, acct_rules=acct_rules, acct_fees=acct_fees) for i in range(num_traders)]
         self.traders = {i: j for (i, j) in zip(range(num_traders), trader_array)}
         self.avg_pnl = 0
         self.avg_days = 0
@@ -98,28 +96,21 @@ class Simulation:
         self.pct_wins = (sum_winning_traders / len(self.traders)) * 100
         self.pct_pass_eval = (sum_passed_eval / len(self.traders)) * 100
 
-    def print_sim_results(self):
-        print("Estimate odds of passing a prop eval with trailing drawdown \n"
-              "given a single setup with a defined bracket and win percentage.\n"
-              "Costs ignored. \n"
-              "NOT FINANCIAL ADVICE. \n"
-              "DO YOUR OWN RESEARCH. \n"
-              "NO GUARANTEE OUR MATH IS CORRECT. \n"
-              "RISK DISCLAIMER: https://www.prop-alpha.com/disclaimer")
-        print(f"Estimated Subscription EV: ${self.avg_pnl:.2f}")
-        print(f"Average Number of Days Traded: {self.avg_days:.1f}")
-        print(f"Percent Wins (Full Payout): {self.pct_wins:.2f}%")
-        print(f"Average Days Traded On Winning Runs: {self.avg_days_to_win:.1f}")
-        print(f'Max Days Traded On Winning Run: {self.max_days_to_win}')
-        print(f'Min Days Traded On Winning Run: {self.min_days_to_win}')
-        print(f"Average Days Traded On Losing Runs: {self.avg_days_to_lose:.1f}")
-        print(f'Max Days Traded On Losing Run: {self.max_days_to_lose}')
-        print(f'Min Days Traded On Losing Run: {self.min_days_to_lose}')
-        print(f"Average Winning Payout: ${self.avg_win_pnl:.2f}")
-        print(f'Max Winning Payout: ${self.max_payout:.2f}')
-        print(f'Min Winning Payout: ${self.min_payout: .2f}')
-        print(f"Average Loss Cost: ${self.avg_lose_pnl:.2f}")
-        print(f"Percent Pass Eval: {self.pct_pass_eval:.2f}%")
+    def sim_results(self):
+        return f"Estimated Subscription EV: ${self.avg_pnl:.2f}\n" + \
+            f"Average Number of Days Traded: {self.avg_days:.1f}\n" + \
+            f"Percent Wins (Full Payout): {self.pct_wins:.2f}%\n" + \
+            f"Average Days Traded On Winning Runs: {self.avg_days_to_win:.1f}\n" + \
+            f'Max Days Traded On Winning Run: {self.max_days_to_win}\n' + \
+            f'Min Days Traded On Winning Run: {self.min_days_to_win}\n' + \
+            f"Average Days Traded On Losing Runs: {self.avg_days_to_lose:.1f}\n" + \
+            f'Max Days Traded On Losing Run: {self.max_days_to_lose}\n' + \
+            f'Min Days Traded On Losing Run: {self.min_days_to_lose}\n' + \
+            f"Average Winning Payout: ${self.avg_win_pnl:.2f}\n" + \
+            f'Max Winning Payout: ${self.max_payout:.2f}\n' + \
+            f'Min Winning Payout: ${self.min_payout: .2f}\n' + \
+            f"Average Loss Cost: ${self.avg_lose_pnl:.2f}\n" + \
+            f"Percent Pass Eval: {self.pct_pass_eval:.2f}%"
 
     # def plot_outcomes(self):
     #     # Store the equity curve for this simulation along with its color
@@ -147,47 +138,3 @@ class Simulation:
     #     plt.show()  # display the plot once after all curves have been plotted
     #     # TODO: hockey stick plot, histogram (condition on win?)
 
-
-# Example:
-if __name__ == '__main__':
-    # we have a trailing dd amount
-    print("Estimate odds of passing a prop eval with trailing drawdown \n"
-          "given a single setup with a defined bracket and win percentage.\n"
-          "Costs ignored. \n"
-          "NOT FINANCIAL ADVICE. \n"
-          "DO YOUR OWN RESEARCH. \n"
-          "NO GUARANTEE OUR MATH IS CORRECT. \n"
-          "RISK DISCLAIMER: https://www.prop-alpha.com/disclaimer")
-    while True:
-        # main program
-        # we have a risk, reward, win % for each trade
-        stop_width = float(input("Enter Stop Size in Currency: "))
-        tp_width = float(input("Enter Take Profit Size in Currency: "))
-        win_pct = float(input("Enter Estimated Win Percent: "))
-        mfe = float(input("Enter average MFE in Currency: "))
-        trades_per_day = int(input("Enter Number of Trades Per Day: "))
-        win_pct /= 100
-        strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
-                                   stop_width=stop_width, tp_width=tp_width)
-        rules = {'Initial Balance (Eval)': 150000, 'Initial Balance (Funded)': 150000, 'Max Loss (Eval)': 4500,
-                 'Max Loss (Funded)': 4500, 'Funding Target Balance': 159000,
-                 'Unshared Winning Balance (Funded)': 160000,
-                 'Profit Share Fraction': .9, 'Winning Day PnL Minimum': 200, 'Maximum Daily Loss': 3000,
-                 'Maximum Daily Win': 4500, 'Minimum Winning Days for Payout': 30, 'Minimum Winning Balance': 160000
-                 }  # Example rules, adjust as needed
-        fees = {'Eval Acct Cost': 150, 'Funded Acct Setup Cost': 150, 'Per Side Trade Cost': 2,
-                'Trade Entry Slippage': 0,
-                'Trade Stop Slippage': 10, 'Monthly Funded Account Cost': 0}  # Example fees, adjust as needed
-        sim = Simulation(trading_strat=strategy, num_traders=20000, acct_rules=rules, acct_fees=fees)
-        sim.run()
-        sim.print_sim_results()
-        while True:
-            answer = str(input('Run again? (y/n): '))
-            if answer in ('y', 'n'):
-                break
-            print("invalid input.")
-        if answer == 'y':
-            continue
-        else:
-            print("Goodbye")
-            break

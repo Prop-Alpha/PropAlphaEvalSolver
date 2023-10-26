@@ -18,6 +18,8 @@ class TradingStrategy:
                                 p=[self.odds, 1 - self.odds])
 
     def simulate_favorable_excursion(self):
+        if self.mfe == 0:
+            return 0
         if self.mfe * 2 <= self.bracket_tp_width_currency:
             return np.random.uniform(0, 2 * self.mfe)
         else:
