@@ -12,6 +12,26 @@ def convert_to_markdown(text):
     return markdown.markdown(text)
 
 
+def convert_to_markdown(text):
+    markdown = ''
+    lines = text.split('\n')
+
+    for line in lines:
+        if line.startswith('#'):
+            level = line.count('#')
+            markdown += f"{'#' * level} {line[level:].strip()}\n"
+        elif line.startswith('* '):
+            markdown += f"- {line[2:]}\n"
+        elif line.startswith('1. '):
+            markdown += f"1. {line[3:]}\n"
+        elif line.startswith('> '):
+            markdown += f"> {line[2:]}\n"
+        else:
+            markdown += line + '\n'
+
+    return markdown
+
+
 def run():
     image = Image.open('propalpha_logo.png')
 
