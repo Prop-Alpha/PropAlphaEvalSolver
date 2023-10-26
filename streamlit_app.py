@@ -5,12 +5,6 @@ import streamlit as st
 from PIL import Image
 from simulation import Simulation
 from trading_strategies import TradingStrategy
-import markdown
-
-
-def convert_to_markdown(text):
-    return markdown.markdown(text)
-
 
 def run():
     image = Image.open('propalpha_logo.png')
@@ -127,8 +121,7 @@ def run():
                              acct_rules=account_rule_presets[selected_acct_preset], acct_fees=fees)
             sim.run()
             result = sim.sim_results()
-            result = convert_to_markdown(result)
-            status_message.markdown(result)
+            status_message.text(result)
         else:
             st.warning("Please provide all input values before computing.")
 
