@@ -96,8 +96,8 @@ def run():
             "Trade Stop Slippage": trade_stop_slippage,
             "Monthly Funded Account Cost": monthly_cost
         }
-        stop_width = st.number_input("Enter Stop Size in Currency", value=3000.0)
-        tp_width = st.number_input("Enter Take Profit Size in Currency", value=3000.0)
+        stop_width = st.number_input("Enter Stop Size in Currency", value=3000)
+        tp_width = st.number_input("Enter Take Profit Size in Currency", value=3000)
         win_pct = st.number_input("Enter Estimated Win Percent", value=50.0)
         mfe = st.number_input("Enter Estimated MFE (of Losing Trades) in Currency", value=500)
         trades_per_day = st.number_input("Enter Number of Trades Per Day", value=3)
