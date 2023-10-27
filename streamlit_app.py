@@ -6,6 +6,7 @@ from PIL import Image
 from simulation import Simulation
 from trading_strategies import TradingStrategy
 
+
 def run():
     image = Image.open('propalpha_logo.png')
 
@@ -54,17 +55,17 @@ def run():
                          }
     }
     cost_fee_preset = {
-        "Custom": {
-            "Eval Acct Cost": 0,
-            "Funded Acct Setup Cost": 0,
+        "Topstep": {
+            "Eval Acct Cost": 149,
+            "Funded Acct Setup Cost": 149,
             "Per Side Trade Cost": 0,
             "Trade Entry Slippage": 0,
             "Trade Stop Slippage": 0,
             "Monthly Funded Account Cost": 0
         },
-        "Topstep": {
-            "Eval Acct Cost": 149,
-            "Funded Acct Setup Cost": 149,
+        "Custom": {
+            "Eval Acct Cost": 0,
+            "Funded Acct Setup Cost": 0,
             "Per Side Trade Cost": 0,
             "Trade Entry Slippage": 0,
             "Trade Stop Slippage": 0,
