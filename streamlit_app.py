@@ -21,9 +21,9 @@ def run():
     st.title("Prop Alpha Eval Solver")
 
     st.markdown("""
-        Estimate the expected full payout value for prop trading accounts, given a 
-        set of rules, fees, and a trade strategy. Factors in EOD trailing drawdown. 
-        Strategy includes defined order bracket, win rate, and average MFE.\n
+        Estimate the expected full payout value for prop trading accounts, given 
+        costs, fees, rules, and a trade strategy. Factors in EOD trailing 
+        drawdown. Strategy includes defined order bracket, win rate, and average MFE.\n
         NOT FINANCIAL ADVICE.\n
         DO YOUR OWN RESEARCH.\n
         NO GUARANTEE OUR MATH IS CORRECT.\n
