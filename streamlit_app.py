@@ -168,13 +168,14 @@ def run():
 
         # If all checks pass, perform the computation
         if individual_vars_valid and dict_values_non_negative and rules and fees:
-            # Display a message saying the computation is running
-            status_message.text("Computing... Please wait.")
-            strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
-                                       stop_width=stop_width, tp_width=tp_width)
-            sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
-                             acct_rules=rules, acct_fees=fees)
-            sim.run()
+
+            with st.spinner('Computing... Please wait.'):
+                strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
+                                           stop_width=stop_width, tp_width=tp_width)
+                sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
+                                 acct_rules=rules, acct_fees=fees)
+                sim.run()
+
             result = sim.sim_results()
             status_message.text(result)
         else:
