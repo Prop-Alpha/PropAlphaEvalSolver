@@ -7,7 +7,7 @@ from trading_strategies import TradingStrategy
 
 
 def run():
-    
+
     st.markdown(
         '<a href="https://www.prop-alpha.com/" target="_blank">'
         '<img src="./app/static/propalpha_banner.png" width="700">'
