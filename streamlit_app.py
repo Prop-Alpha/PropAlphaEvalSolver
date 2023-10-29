@@ -2,22 +2,18 @@
 # https://github.com/vespatrades/PropAlphaEvalCalculator_Streamlit/blob/master/streamlit_app.py
 
 import streamlit as st
-from PIL import Image
 from simulation import Simulation
 from trading_strategies import TradingStrategy
 
 
 def run():
-    image = Image.open('propalpha_logo.png')
-
-    col1, col2, col3 = st.columns([6, 6, 6])
-
-    with col1:
-        st.write("")
-    with col2:
-        st.image(image, width=100)
-    with col3:
-        st.write("")
+    
+    st.markdown(
+        '<a href="https://www.prop-alpha.com/" target="_blank">'
+        '<img src="./app/static/propalpha_banner.png" width="700">'
+        '</a>',
+        unsafe_allow_html=True,
+    )
 
     st.title("Prop Alpha Eval Solver")
 
@@ -205,6 +201,16 @@ def run():
                 "Trade Stop Slippage": trade_stop_slippage,
                 "Monthly Funded Account Cost": monthly_cost
             }
+
+            st.divider()
+
+            st.markdown(
+                """
+                Web: [PropAlpha](https://www.prop-alpha.com/)
+                
+                Twitter: [@PropAlphaTrades](https://twitter.com/PropAlphaTrades)
+                """
+            )
 
         st.divider()
         st.subheader('Trade Strategy')
