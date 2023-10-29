@@ -124,102 +124,25 @@ def run():
     # --- Sidebar Elements --- #
     with st.sidebar:
         st.markdown("# Account Rules")
-        selected_acct_preset = st.selectbox(label="Preset rules", index=2, options=list(account_rule_presets.keys()))
+        selected_acct_preset = st.selectbox(label="Presets", label_visibility="hidden", index=2, options=list(account_rule_presets.keys()))
         with st.expander("Advanced Account Rules Input"):
-            intial_balance_eval = st.number_input("Initial Balance (Eval)",
-                                                  value=account_rule_presets[selected_acct_preset][
-                                                      "Initial Balance (Eval)"], step=100)
-
-            initial_balance_funded = st.number_input("Initial Balance (Funded)",
-                                                     value=account_rule_presets[selected_acct_preset][
-                                                         "Initial Balance (Funded)"], step=100)
-
-            max_loss_eval = st.number_input("Max Loss (Eval)",
-                                            value=account_rule_presets[selected_acct_preset][
-                                                "Max Loss (Eval)"], step=100)
-
-            max_loss_funded = st.number_input("Max Loss (Funded)",
-                                              value=account_rule_presets[selected_acct_preset][
-                                                  "Max Loss (Funded)"], step=100)
-
-            funding_target_balance = st.number_input("Funding Target Balance",
-                                                     value=account_rule_presets[selected_acct_preset][
-                                                         "Funding Target Balance"], step=100)
-
-            unshared_winning_balance_funded = st.number_input("Unshared Winning Balance (Funded)",
-                                                              value=account_rule_presets[selected_acct_preset][
-                                                                  "Unshared Winning Balance (Funded)"], step=100)
-
-            profit_share_fraction = st.number_input("Profit Share Fraction",
-                                                    value=account_rule_presets[selected_acct_preset][
-                                                        "Profit Share Fraction"], step=0.1)
-
-            winning_day_pnl_min = st.number_input("Winning Day PnL Minimum",
-                                                  value=account_rule_presets[selected_acct_preset][
-                                                      "Winning Day PnL Minimum"], step=100)
-
-            max_daily_loss = st.number_input("Maximum Daily Loss",
-                                             value=account_rule_presets[selected_acct_preset][
-                                                 "Maximum Daily Loss"], step=100)
-
-            max_daily_win = st.number_input("Maximum Daily Win",
-                                            value=account_rule_presets[selected_acct_preset][
-                                                "Maximum Daily Win"], step=100)
-
-            min_winning_days_for_payout = st.number_input("Minimum Winning Days for Payout",
-                                                          value=account_rule_presets[selected_acct_preset][
-                                                              "Minimum Winning Days for Payout"], step=1)
-
-            minimum_winning_balance = st.number_input("Minimum Winning Balance",
-                                                      value=account_rule_presets[selected_acct_preset][
-                                                          "Minimum Winning Balance"], step=100)
-
-        rules = {
-            'Initial Balance (Eval)': intial_balance_eval,
-            'Initial Balance (Funded)': initial_balance_funded,
-            'Max Loss (Eval)': max_loss_eval,
-            'Max Loss (Funded)': max_loss_funded,
-            'Funding Target Balance': funding_target_balance,
-            'Unshared Winning Balance (Funded)': unshared_winning_balance_funded,
-            'Profit Share Fraction': profit_share_fraction,
-            'Winning Day PnL Minimum': winning_day_pnl_min,
-            'Maximum Daily Loss': max_daily_loss,
-            'Maximum Daily Win': max_daily_win,
-            'Minimum Winning Days for Payout': min_winning_days_for_payout,
-            'Minimum Winning Balance': minimum_winning_balance
-        }
+            # Dynamically generate inputs based on the keys in the selected preset
+            rules = {}
+            for key, default_value in account_rule_presets[selected_acct_preset].items():
+                # Determine step size based on the key (this can be refined)
+                step_size = 0.1 if "Fraction" in key else 100
+                rules[key] = st.number_input(key, value=default_value, step=step_size)
 
         st.divider()
         st.markdown("# Account Costs/Fees")
-        selected_fee_preset = st.selectbox(label="Preset fees", options=list(cost_fee_preset.keys()))
+        selected_fee_preset = st.selectbox(label="Presets", label_visibility="hidden", index=-0, options=list(cost_fee_preset.keys()))
 
-        with st.expander("Advanced Cost/Fee Inputs"):
-            # Cost/fee
-            eval_cost = st.number_input("Eval Account Cost",
-                                        value=cost_fee_preset[selected_fee_preset]["Eval Acct Cost"], step=1)
-
-            funded_cost = st.number_input("Funded Account Setup Cost",
-                                          value=cost_fee_preset[selected_fee_preset]["Funded Acct Setup Cost"], step=1)
-
-            per_side_cost = st.number_input("Per Side Trade Cost",
-                                            value=cost_fee_preset[selected_fee_preset]["Per Side Trade Cost"])
-
-            trade_entry_slippage = st.number_input("Trade Entry Slippage Estimate in Currency",
-                                                   value=cost_fee_preset[selected_fee_preset]["Trade Entry Slippage"])
-
-            trade_stop_slippage = st.number_input("Stop Loss Slippage Estimate in Currency",
-                                                  value=cost_fee_preset[selected_fee_preset]["Trade Stop Slippage"])
-
-            monthly_cost = st.number_input("Monthly Funded Account Cost",
-                                           value=cost_fee_preset[selected_fee_preset]["Monthly Funded Account Cost"])
-        fees = {
-            "Eval Acct Cost": eval_cost,
-            "Funded Acct Setup Cost": funded_cost,
-            "Per Side Trade Cost": per_side_cost,
-            "Trade Entry Slippage": trade_entry_slippage,
-            "Trade Stop Slippage": trade_stop_slippage,
-            "Monthly Funded Account Cost": monthly_cost
-        }
+        with st.expander("Advanced Cost/Fee Input"):
+            # Dynamically generate inputs based on the keys in the selected preset
+            fees = {}
+            for key in cost_fee_preset[selected_fee_preset].keys():
+                # We use the key to get the display name and the default value for the input
+                fees[key] = st.number_input(key, value=cost_fee_preset[selected_fee_preset][key])
 
         st.divider()
 
