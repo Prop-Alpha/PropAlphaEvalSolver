@@ -1,6 +1,3 @@
-
-<img src="propalpha_logo.png" width="200">
-
 # PropAlphaEvalSolver
 
 PropAlphaEvalSolver is a simulation tool for estimating the expected full payout 
