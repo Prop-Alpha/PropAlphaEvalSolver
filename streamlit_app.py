@@ -135,7 +135,7 @@ def run():
 
         st.divider()
         st.markdown("# Account Costs/Fees")
-        selected_fee_preset = st.selectbox(label="Presets", label_visibility="hidden", index=-0, options=list(cost_fee_preset.keys()))
+        selected_fee_preset = st.selectbox(label="Presets", label_visibility="hidden", index=0, options=list(cost_fee_preset.keys()))
 
         with st.expander("Advanced Cost/Fee Input"):
             # Dynamically generate inputs based on the keys in the selected preset
