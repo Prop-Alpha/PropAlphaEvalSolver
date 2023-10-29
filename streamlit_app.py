@@ -159,9 +159,15 @@ def run():
         # Reserve a spot for our status message
         status_message = st.empty()
 
-        # We can further check if all input fields are provided, although it's not strictly necessary since there are
-        # default values.
-        if all([trades_per_day, stop_width, tp_width, win_pct]):
+        # Check if individual variables are defined and non-negative
+        individual_vars_valid = all(
+            [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
+
+        # Check if dictionaries are not empty and contain only non-negative values
+        dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
+
+        # If all checks pass, perform the computation
+        if individual_vars_valid and dict_values_non_negative and rules and fees:
             # Display a message saying the computation is running
             status_message.text("Computing... Please wait.")
             strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
@@ -172,7 +178,7 @@ def run():
             result = sim.sim_results()
             status_message.text(result)
         else:
-            st.warning("Please provide all input values before computing.")
+            st.warning("Please ensure all input values are provided and non-negative before computing.")
 
 
 if __name__ == '__main__':
