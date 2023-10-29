@@ -226,7 +226,8 @@ def run():
         st.markdown(
             """
             Web: [PropAlpha](https://www.prop-alpha.com/)  
-            Twitter: [@PropAlphaTrades](https://twitter.com/PropAlphaTrades)
+            Twitter: [@PropAlphaTrades](https://twitter.com/PropAlphaTrades)  
+            [![GitHub Repo](https://badgen.net/badge/icon/GitHub?icon=github&color=black&label)](https://github.com/Prop-Alpha/PropAlphaEvalSolver/)
             """
         )
 
