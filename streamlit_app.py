@@ -81,6 +81,41 @@ cost_fee_preset = {
 
 def run():
     with st.container():
+        # --- Sidebar Elements --- #
+        with st.sidebar:
+            st.markdown("# Account Rules")
+            selected_acct_preset = st.selectbox(label="Presets", label_visibility="hidden", index=2,
+                                                options=list(account_rule_presets.keys()))
+            with st.expander("Advanced Account Rules Input"):
+                # Dynamically generate inputs based on the keys in the selected preset
+                rules = {}
+                for key, default_value in account_rule_presets[selected_acct_preset].items():
+                    # Determine step size based on the key (this can be refined)
+                    step_size = 0.1 if "Fraction" in key else 100
+                    rules[key] = st.number_input(key, value=default_value, step=step_size)
+
+            st.divider()
+            st.markdown("# Account Costs/Fees")
+            selected_fee_preset = st.selectbox(label="Presets", label_visibility="hidden", index=0,
+                                               options=list(cost_fee_preset.keys()))
+
+            with st.expander("Advanced Cost/Fee Input"):
+                # Dynamically generate inputs based on the keys in the selected preset
+                fees = {}
+                for key in cost_fee_preset[selected_fee_preset].keys():
+                    # We use the key to get the display name and the default value for the input
+                    fees[key] = st.number_input(key, value=cost_fee_preset[selected_fee_preset][key])
+
+            st.divider()
+
+            st.markdown(
+                """
+                Web: [PropAlpha](https://www.prop-alpha.com/)  
+                Twitter: [@PropAlphaTrades](https://twitter.com/PropAlphaTrades)  
+                [![GitHub Repo](https://badgen.net/badge/icon/GitHub?icon=github&color=black&label)](https://github.com/Prop-Alpha/PropAlphaEvalSolver/)
+                """
+            )
+
         # --- Main Elements --- #
         st.markdown(
             '<a href="https://www.prop-alpha.com/" target="_blank">'
@@ -102,84 +137,59 @@ def run():
             RISK DISCLAIMER: https://www.prop-alpha.com/disclaimer
         ''')
         st.divider()
-        st.subheader('Trade Strategy')
-        stop_width = st.number_input(label="Enter Stop Size in Currency", help="Stop loss in dollars", value=3000,
-                                     step=100)
 
-        tp_width = st.number_input(label="Enter Take Profit Size in Currency", help="Take profit in dollars",
-                                   value=3000, step=100)
+        # Create columns for "Trade Strategy", "Computational Elements" and results
+        col1, padding, col2 = st.columns((9, 1, 11))
 
-        win_pct = st.number_input(label="Enter Estimated Win Percent", help="", value=50.0, step=0.1)
-        win_pct /= 100  # convert the percentage value into a proportion
+        with col1:
 
-        mfe = st.number_input(label="Enter Estimated MFE (of Losing Trades) in Currency", value=500, step=10)
+            # --- Trade Strategy Elements --- #
+            st.subheader('Trade Strategy')
+            stop_width = st.number_input(label="Enter Stop Size in Currency", help="Stop loss in dollars", value=3000,
+                                         step=100)
 
-        trades_per_day = st.number_input(label="Enter Number of Trades Per Day",
-                                         help="Number of trades strategy takes in a single day", value=3, step=1)
+            tp_width = st.number_input(label="Enter Take Profit Size in Currency", help="Take profit in dollars",
+                                       value=3000, step=100)
 
-        monte_carlo_runs = st.number_input("Enter Number of Runs in Simulation", value=20000, step=1000)
+            win_pct = st.number_input(label="Enter Estimated Win Percent", help="", value=50.0, step=0.1)
+            win_pct /= 100  # convert the percentage value into a proportion
 
-    compute_button = st.button("Compute Results")
+            mfe = st.number_input(label="Enter Estimated MFE (of Losing Trades) in Currency", value=500, step=10)
 
-    # --- Sidebar Elements --- #
-    with st.sidebar:
-        st.markdown("# Account Rules")
-        selected_acct_preset = st.selectbox(label="Presets", label_visibility="hidden", index=2, options=list(account_rule_presets.keys()))
-        with st.expander("Advanced Account Rules Input"):
-            # Dynamically generate inputs based on the keys in the selected preset
-            rules = {}
-            for key, default_value in account_rule_presets[selected_acct_preset].items():
-                # Determine step size based on the key (this can be refined)
-                step_size = 0.1 if "Fraction" in key else 100
-                rules[key] = st.number_input(key, value=default_value, step=step_size)
+            trades_per_day = st.number_input(label="Enter Number of Trades Per Day",
+                                             help="Number of trades strategy takes in a single day", value=3, step=1)
 
-        st.divider()
-        st.markdown("# Account Costs/Fees")
-        selected_fee_preset = st.selectbox(label="Presets", label_visibility="hidden", index=0, options=list(cost_fee_preset.keys()))
+            monte_carlo_runs = st.number_input("Enter Number of Runs in Simulation", value=20000, step=1000)
 
-        with st.expander("Advanced Cost/Fee Input"):
-            # Dynamically generate inputs based on the keys in the selected preset
-            fees = {}
-            for key in cost_fee_preset[selected_fee_preset].keys():
-                # We use the key to get the display name and the default value for the input
-                fees[key] = st.number_input(key, value=cost_fee_preset[selected_fee_preset][key])
-
-        st.divider()
-
-        st.markdown(
-            """
-            Web: [PropAlpha](https://www.prop-alpha.com/)  
-            Twitter: [@PropAlphaTrades](https://twitter.com/PropAlphaTrades)  
-            [![GitHub Repo](https://badgen.net/badge/icon/GitHub?icon=github&color=black&label)](https://github.com/Prop-Alpha/PropAlphaEvalSolver/)
-            """
-        )
+            compute_button = st.button("Compute Results")
 
     # --- Computation Elements --- #
-    if compute_button:
-        # Reserve a spot for our status message
-        status_message = st.empty()
+    with col2:
+        if compute_button:
+            # Reserve a spot for our status message
+            status_message = st.empty()
 
-        # Check if individual variables are defined and non-negative
-        individual_vars_valid = all(
-            [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
+            # Check if individual variables are defined and non-negative
+            individual_vars_valid = all(
+                [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
 
-        # Check if dictionaries are not empty and contain only non-negative values
-        dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
+            # Check if dictionaries are not empty and contain only non-negative values
+            dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
 
-        # If all checks pass, perform the computation
-        if individual_vars_valid and dict_values_non_negative and rules and fees:
+            # If all checks pass, perform the computation
+            if individual_vars_valid and dict_values_non_negative and rules and fees:
 
-            with st.spinner('Computing... Please wait.'):
-                strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
-                                           stop_width=stop_width, tp_width=tp_width)
-                sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
-                                 acct_rules=rules, acct_fees=fees)
-                sim.run()
+                with st.spinner('Computing... Please wait.'):
+                    strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
+                                               stop_width=stop_width, tp_width=tp_width)
+                    sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
+                                     acct_rules=rules, acct_fees=fees)
+                    sim.run()
 
-            result = sim.sim_results()
-            status_message.text(result)
-        else:
-            st.warning("Please ensure all input values are provided and non-negative before computing.")
+                result = sim.sim_results()
+                status_message.text(result)
+            else:
+                st.warning("Please ensure all input values are provided and non-negative before computing.")
 
 
 if __name__ == '__main__':
