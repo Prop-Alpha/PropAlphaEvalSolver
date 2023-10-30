@@ -1,9 +1,7 @@
 import numpy as np
-
 from trader import Trader
-
-
-# import matplotlib.pyplot as plt
+from io import BytesIO
+import matplotlib.pyplot as plt
 
 
 class Simulation:
@@ -112,29 +110,37 @@ class Simulation:
             f"Average Loss Cost: ${self.avg_lose_pnl:.2f}\n" + \
             f"Percent Pass Eval: {self.pct_pass_eval:.2f}%"
 
-    # def plot_outcomes(self):
-    #     # Store the equity curve for this simulation along with its color
-    #     # Plot each equity curve with the computed y-axis limits
-    #     # Compute y-axis limits for the plots
-    #     final_winning_balances = [self.traders[i].running_balance[-1] for i in self.winning_trader_numbers]
-    #     median_final_balance = np.median(np.array(final_winning_balances))
-    #     median_balance_number = None
-    #     for i in self.winning_trader_numbers:
-    #         if self.traders[i].running_balance[-1] == median_final_balance:
-    #             median_balance_number = i
-    #     max_winning_trader = self.traders[self.max_winning_trader_number]
-    #     min_winning_trader = self.traders[self.min_winning_trader_number]
-    #     plt.plot(max_winning_trader.running_balance, color='blue', label='max payout')
-    #     if median_balance_number:
-    #         plt.plot(self.traders[median_balance_number].running_balance, color='black', label='median payout')
-    #     plt.plot(min_winning_trader.running_balance, color='red', label='min payout')
-    #     min_value = min(min(max_winning_trader.running_balance), min(min_winning_trader.running_balance))
-    #     max_value = max(max(max_winning_trader.running_balance), max(min_winning_trader.running_balance))
-    #     plt.ylim(min_value, max_value)
-    #     plt.xlabel('Number of Days Traded')
-    #     plt.ylabel('Account Balance')
-    #     plt.title('Topstep 150k Account Simulation')
-    #     plt.legend(loc='upper right')
-    #     plt.show()  # display the plot once after all curves have been plotted
-    #     # TODO: hockey stick plot, histogram (condition on win?)
+    def plot_outcomes(self):
+        # Store the equity curve for this simulation along with its color
+        # Plot each equity curve with the computed y-axis limits
+        # Compute y-axis limits for the plots
+
+        plt.figure(figsize=(12, 8))  # Set the figure size to 8 inches wide and 6 inches tall
+        final_winning_balances = [self.traders[i].running_balance[-1] for i in self.winning_trader_numbers]
+        median_final_balance = np.median(np.array(final_winning_balances))
+        median_balance_number = None
+        for i in self.winning_trader_numbers:
+            if self.traders[i].running_balance[-1] == median_final_balance:
+                median_balance_number = i
+        max_winning_trader = self.traders[self.max_winning_trader_number]
+        min_winning_trader = self.traders[self.min_winning_trader_number]
+        plt.plot(max_winning_trader.running_balance, color='blue', label='max payout')
+        if median_balance_number:
+            plt.plot(self.traders[median_balance_number].running_balance, color='black', label='median payout')
+        plt.plot(min_winning_trader.running_balance, color='red', label='min payout')
+        min_value = min(min(max_winning_trader.running_balance), min(min_winning_trader.running_balance))
+        max_value = max(max(max_winning_trader.running_balance), max(min_winning_trader.running_balance))
+        plt.ylim(min_value, max_value)
+        plt.xlabel('Number of Days Traded')
+        plt.ylabel('Account Balance')
+        plt.title('Topstep 150k Account Simulation')
+        plt.legend(loc='upper right')
+        # plt.show()  # display the plot once after all curves have been plotted
+        # TODO: hockey stick plot, histogram (condition on win?)
+        buf = BytesIO()  # Create a bytes buffer to save the image
+        plt.savefig(buf, format="png")  # Save the image to the buffer
+        plt.close()  # Close the plot
+
+        buf.seek(0)  # Move the cursor to the start of the buffer
+        return buf  # Return the buffer containing the image data
 
