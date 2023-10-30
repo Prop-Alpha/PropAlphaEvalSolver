@@ -4,6 +4,7 @@
 import streamlit as st
 from simulation import Simulation
 from trading_strategies import TradingStrategy
+from PIL import Image
 
 account_rule_presets = {
     "Topstep 50k": {'Initial Balance (Eval)': 50000,
@@ -190,6 +191,13 @@ def run():
                 status_message.text(result)
             else:
                 st.warning("Please ensure all input values are provided and non-negative before computing.")
+
+    # Outside of the column containers:
+    if compute_button and sim.pct_wins > 0:  # Make sure you have winners before plotting
+        # After running the simulation, plot outcomes
+        buf = sim.plot_outcomes()
+        image = Image.open(buf)
+        st.image(image, caption='Simulation Outcomes')  # Remove the use_column_width=True
 
 
 if __name__ == '__main__':
