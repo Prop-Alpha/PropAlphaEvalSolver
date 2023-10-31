@@ -12,6 +12,7 @@ class Trader:
         self.stop_slippage = acct_fees['Trade Stop Slippage']
         self.months_traded = 0
         self.running_balance = []
+        self.passed_eval = False
 
     def trade_for_day(self):
         finished_day_without_stop_condition = True
@@ -27,6 +28,7 @@ class Trader:
             if result == 'PASS EVAL':
                 self.PnL -= self.fees['Funded Acct Setup Cost']
                 finished_day_without_stop_condition = False
+                self.passed_eval = True
                 break
             elif result == 'FAIL':
                 finished_day_without_stop_condition = False

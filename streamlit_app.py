@@ -84,6 +84,10 @@ def run():
     with st.container():
         # --- Sidebar Elements --- #
         with st.sidebar:
+            st.markdown("# Game Type")
+            selected_game_preset = st.selectbox(label="Presets", label_visibility="hidden", index=0,
+                                                options=['Combine + Funded', 'Combine Only', 'Funded Only'])
+
             st.markdown("# Account Rules")
             selected_acct_preset = st.selectbox(label="Presets", label_visibility="hidden", index=2,
                                                 options=list(account_rule_presets.keys()))
@@ -185,15 +189,22 @@ def run():
                                                stop_width=stop_width, tp_width=tp_width)
                     sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
                                      acct_rules=rules, acct_fees=fees)
-                    sim.run()
-
-                result = sim.sim_results()
+                    if selected_game_preset == 'Combine + Funded':
+                        sim.run()
+                        result = sim.sim_results()
+                    elif selected_game_preset == 'Combine Only':
+                        sim.run_eval_only()
+                        result = sim.eval_only_sim_results()
+                    else:
+                        sim.run_funded_only()
+                        result = sim.funded_only_sim_results()
+                
                 status_message.text(result)
             else:
                 st.warning("Please ensure all input values are provided and non-negative before computing.")
 
     # Outside of the column containers:
-    if compute_button and sim.pct_wins > 0:  # Make sure you have winners before plotting
+    if (compute_button and sim.pct_wins > 0) and selected_game_preset != 'Combine Only':  # Make sure you have winners before plotting
         # After running the simulation, plot outcomes
         buf = sim.plot_outcomes()
         image = Image.open(buf)
