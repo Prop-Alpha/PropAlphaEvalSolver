@@ -1,11 +1,18 @@
 # PropAlphaEvalSolver
 
+Prop trading accounts are essentially path-dependent call options. The player/customer
+purchases a game with limited downside (i.e. the combine/Eval cost and funded account costs)
+and theoretically uncapped upside. Not every path with the same terminal account value
+is an admissible path (due to drawdown rules etc) and therefore the option payout is path-
+dependent. Pricing this option thus necessitates a monte carlo simulation of the possible
+account paths.
+
 PropAlphaEvalSolver is a simulation tool for estimating the expected full payout 
 of a trading strategy on a prop account. This tool is designed to work with 
 a single trading setup, considering specific parameters such as a defined order 
 bracket, known win percentage, and average maximum favorable excursion (MFE). It 
 factors in costs and rules of the prop trading account. The front-end is powered 
-by Streamlit.
+by Streamlit. Created by Prop Alpha (www.prop-alpha.com) in collaboration with Vespatrades.
 
 ## Table of Contents
 
