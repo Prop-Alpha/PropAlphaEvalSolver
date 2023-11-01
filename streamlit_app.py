@@ -6,6 +6,10 @@ from simulation import Simulation
 from trading_strategies import TradingStrategy
 from PIL import Image
 
+st.set_page_config(layout="wide",
+                   page_icon="./app/static/favicon.ico",
+                   page_title="Prop Alpha Eval Solver")
+
 account_rule_presets = {
     "Topstep 50k": {'Initial Balance (Eval)': 50000,
                     'Initial Balance (Funded)': 50000,
