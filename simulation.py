@@ -195,44 +195,39 @@ class Simulation:
             self.avg_days_to_lose = 0
             self.avg_lose_pnl = 0
         self.pct_wins = (sum_winning_traders / len(self.traders)) * 100
-    
+
     def sim_results(self):
-        return f"Estimated Subscription EV: ${self.avg_pnl:.2f}\n" + \
-            f"Average Number of Days Traded: {self.avg_days:.1f}\n" + \
-            f"Percent Wins (Full Payout): {self.pct_wins:.2f}%\n" + \
-            f"Average Days Traded On Winning Runs: {self.avg_days_to_win:.1f}\n" + \
-            f'Max Days Traded On Winning Run: {self.max_days_to_win}\n' + \
-            f'Min Days Traded On Winning Run: {self.min_days_to_win}\n' + \
-            f"Average Days Traded On Losing Runs: {self.avg_days_to_lose:.1f}\n" + \
-            f'Max Days Traded On Losing Run: {self.max_days_to_lose}\n' + \
-            f'Min Days Traded On Losing Run: {self.min_days_to_lose}\n' + \
-            f"Average Winning Payout: ${self.avg_win_pnl:.2f}\n" + \
-            f'Max Winning Payout: ${self.max_payout:.2f}\n' + \
-            f'Min Winning Payout: ${self.min_payout: .2f}\n' + \
-            f"Average Loss Cost: ${self.avg_lose_pnl:.2f}\n" + \
-            f"Percent Pass Eval: {self.pct_pass_eval:.2f}%"
+        return {
+            "Estimated Subscription EV": f"${self.avg_pnl:.2f}",
+            "Average Number of Days Traded": f"{self.avg_days:.1f}",
+            "Percent Wins (Full Payout)": f"{self.pct_wins:.2f}%",
+            "Average Days Traded On Winning Runs": f"{self.avg_days_to_win:.1f}",
+            "Max Days Traded On Winning Run": self.max_days_to_win,
+            "Min Days Traded On Winning Run": self.min_days_to_win,
+            "Average Days Traded On Losing Runs": f"{self.avg_days_to_lose:.1f}",
+            "Max Days Traded On Losing Run": self.max_days_to_lose,
+            "Min Days Traded On Losing Run": self.min_days_to_lose,
+            "Average Winning Payout": f"${self.avg_win_pnl:.2f}",
+            "Max Winning Payout": f"${self.max_payout:.2f}",
+            "Min Winning Payout": f"${self.min_payout:.2f}",
+            "Average Loss Cost": f"${self.avg_lose_pnl:.2f}",
+            "Percent Pass Eval": f"{self.pct_pass_eval:.2f}%"
+        }
 
     def eval_only_sim_results(self):
-        return f"Average Number of Days Traded: {self.avg_days:.1f}\n" +\
-               f"Average Days Traded On Winning Runs: {self.avg_days_to_win:.1f}\n" +\
-               f"Average Days Traded On Losing Runs: {self.avg_days_to_lose:.1f}\n" +\
-               f"Percent Pass Combine: {self.pct_pass_eval:.2f}%"
+        return {
+            "Average Number of Days Traded": f"{self.avg_days:.1f}",
+            "Average Days Traded On Winning Runs": f"{self.avg_days_to_win:.1f}",
+            "Average Days Traded On Losing Runs": f"{self.avg_days_to_lose:.1f}",
+            "Percent Pass Combine": f"{self.pct_pass_eval:.2f}%"
+        }
 
     def funded_only_sim_results(self):
-        return f"Estimated Account EV: ${self.avg_pnl:.2f}\n" +\
-               f"Average Number of Days Traded: {self.avg_days:.1f}\n" +\
-               f"Percent Wins (Full Payout): {self.pct_wins:.2f}%\n" +\
-               f"Average Days Traded On Winning Runs: {self.avg_days_to_win:.1f}\n" +\
-               f'Max Days Traded On Winning Run: {self.max_days_to_win}\n' +\
-               f'Min Days Traded On Winning Run: {self.min_days_to_win}\n' +\
-               f"Average Days Traded On Losing Runs: {self.avg_days_to_lose:.1f}\n" +\
-               f'Max Days Traded On Losing Run: {self.max_days_to_lose}\n' +\
-               f'Min Days Traded On Losing Run: {self.min_days_to_lose}\n' +\
-               f"Average Winning Payout: ${self.avg_win_pnl:.2f}\n" +\
-               f'Max Winning Payout: ${self.max_payout:.2f}\n' +\
-               f'Min Winning Payout: ${self.min_payout: .2f}\n' +\
-               f"Average Loss Cost: ${self.avg_lose_pnl:.2f}"
-
+        return {
+            "Estimated Account EV": f"${self.avg_pnl:.2f}",
+            "Average Number of Days Traded": f"{self.avg_days:.1f}",
+            "Percent Wins (Full Payout)": f"{self.pct_wins:.2f}%"
+        }
 
     def plot_outcomes(self):
         # Store the equity curve for this simulation along with its color

@@ -5,6 +5,7 @@ import streamlit as st
 from simulation import Simulation
 from trading_strategies import TradingStrategy
 from PIL import Image
+import pandas as pd
 
 st.set_page_config(layout="wide",
                    page_icon="./app/static/favicon.ico",
