@@ -90,7 +90,7 @@ def run():
         # --- Sidebar Elements --- #
         with st.sidebar:
             st.markdown("# Game Type")
-            selected_game_preset = st.radio(label="Game Type",
+            selected_game_preset = st.radio(label="Choose account type",
                                             options=['Combine + Funded', 'Combine Only', 'Funded Only'])
 
             st.markdown("# Account Rules")
