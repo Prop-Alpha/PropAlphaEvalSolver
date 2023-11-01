@@ -12,7 +12,9 @@ of a trading strategy on a prop account. This tool is designed to work with
 a single trading setup, considering specific parameters such as a defined order 
 bracket, known win percentage, and average maximum favorable excursion (MFE). It 
 factors in costs and rules of the prop trading account. The front-end is powered 
-by Streamlit. Created by Prop Alpha (www.prop-alpha.com) in collaboration with Vespatrades.
+by Streamlit. Created by Prop Alpha (www.prop-alpha.com) in collaboration with 
+[vespatrades](https://github.com/vespatrades).
+
 
 ## Table of Contents
 
