@@ -90,11 +90,11 @@ def run():
         # --- Sidebar Elements --- #
         with st.sidebar:
             st.markdown("# Game Type")
-            selected_game_preset = st.selectbox(label="Presets", label_visibility="hidden", index=0,
-                                                options=['Combine + Funded', 'Combine Only', 'Funded Only'])
+            selected_game_preset = st.radio(label="Game Type",
+                                            options=['Combine + Funded', 'Combine Only', 'Funded Only'])
 
             st.markdown("# Account Rules")
-            selected_acct_preset = st.selectbox(label="Presets", label_visibility="hidden", index=2,
+            selected_acct_preset = st.selectbox(label="Choose preset or enter custom", index=2,
                                                 options=list(account_rule_presets.keys()))
             with st.expander("Advanced Account Rules Input"):
                 # Dynamically generate inputs based on the keys in the selected preset
@@ -104,9 +104,8 @@ def run():
                     step_size = 0.1 if "Fraction" in key else 100
                     rules[key] = st.number_input(key, value=default_value, step=step_size)
 
-            st.divider()
             st.markdown("# Account Costs/Fees")
-            selected_fee_preset = st.selectbox(label="Presets", label_visibility="hidden", index=0,
+            selected_fee_preset = st.selectbox(label="Choose preset or enter custom", index=0,
                                                options=list(cost_fee_preset.keys()))
 
             with st.expander("Advanced Cost/Fee Input"):
@@ -127,32 +126,42 @@ def run():
             )
 
         # --- Main Elements --- #
-        st.markdown(
-            '<a href="https://www.prop-alpha.com/" target="_blank">'
-            '<img src="./app/static/propalpha_banner.png" width="715">'
-            '</a>',
-            unsafe_allow_html=True,
-        )
 
-        st.title("Prop Alpha Eval Solver")
-
-        st.markdown('''
-            Estimate the expected full payout value for prop trading accounts, given 
-            costs, fees, rules, and a trade strategy. Factors in EOD trailing 
-            drawdown. Strategy includes defined order bracket, win rate, and average MFE.\n
-
-            NOT FINANCIAL ADVICE.  
-            DO YOUR OWN RESEARCH.  
-            NO GUARANTEE OUR MATH IS CORRECT.  
-            RISK DISCLAIMER: https://www.prop-alpha.com/disclaimer
-        ''')
-        st.divider()
-
-        # Create columns for "Trade Strategy", "Computational Elements" and results
-        col1, padding, col2 = st.columns((9, 1, 11))
+        col1, col2, col3 = st.columns([0.14, 0.72, 0.14])
 
         with col1:
+            st.write("")
 
+        with col2:
+            st.markdown(
+                '<a href="https://www.prop-alpha.com/" target="_blank">'
+                '<img src="./app/static/propalpha_banner.png" width="715">'
+                '</a>',
+                unsafe_allow_html=True,
+            )
+
+            st.title("Prop Alpha Eval Solver")
+
+            st.markdown('''
+                Estimate the expected full payout value for prop trading accounts, given 
+                costs, fees, rules, and a trade strategy.  
+                Factors in EOD trailing drawdown. Strategy includes defined order bracket, win rate, and average MFE.\n
+
+                NOT FINANCIAL ADVICE.  
+                DO YOUR OWN RESEARCH.  
+                NO GUARANTEE OUR MATH IS CORRECT.  
+                RISK DISCLAIMER: https://www.prop-alpha.com/disclaimer
+            ''')
+            st.divider()
+
+        with col3:
+            st.write("")
+
+    with st.container():
+        # Create columns for "Trade Strategy", "Computational Elements" and results
+        col1, col2, col3 = st.columns([0.25, 0.33, 0.42], gap="medium")
+
+        with col1:
             # --- Trade Strategy Elements --- #
             st.subheader('Trade Strategy')
             stop_width = st.number_input(label="Enter Stop Size in Currency", help="Stop loss in dollars", value=3000,
@@ -164,7 +173,7 @@ def run():
             win_pct = st.number_input(label="Enter Estimated Win Percent", help="", value=50.0, step=0.1)
             win_pct /= 100  # convert the percentage value into a proportion
 
-            mfe = st.number_input(label="Enter Estimated MFE (of Losing Trades) in Currency", value=500, step=10)
+            mfe = st.number_input(label="Enter Estimated MFE in Currency", value=500, step=10)
 
             trades_per_day = st.number_input(label="Enter Number of Trades Per Day",
                                              help="Number of trades strategy takes in a single day", value=3, step=1)
@@ -175,6 +184,7 @@ def run():
 
     # --- Computation Elements --- #
     with col2:
+        st.subheader('Results')
         if compute_button:
             # Reserve a spot for our status message
             status_message = st.empty()
@@ -203,17 +213,30 @@ def run():
                     else:
                         sim.run_funded_only()
                         result = sim.funded_only_sim_results()
-                
-                status_message.text(result)
+
+                if isinstance(result, dict):
+                    df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
+                    # Calculate the height
+                    height = (len(df_result) + 1) * 35 + 3
+                    st.dataframe(df_result,
+                                 height=height,
+                                 use_container_width=True,
+                                 hide_index=True)
             else:
                 st.warning("Please ensure all input values are provided and non-negative before computing.")
 
-    # Outside of the column containers:
-    if (compute_button and sim.pct_wins > 0) and selected_game_preset != 'Combine Only':  # Make sure you have winners before plotting
-        # After running the simulation, plot outcomes
-        buf = sim.plot_outcomes()
-        image = Image.open(buf)
-        st.image(image, caption='Simulation Outcomes')  # Remove the use_column_width=True
+        with col3:
+            # Add vertical padding to align with dataframe results
+            st.markdown("##")
+            st.markdown("##")
+
+            # Outside of the column containers:
+            if (
+                    compute_button and sim.pct_wins > 0) and selected_game_preset != 'Combine Only':  # Make sure you have winners before plotting
+                # After running the simulation, plot outcomes
+                buf = sim.plot_outcomes()
+                image = Image.open(buf)
+                st.image(image, caption='Simulation Outcomes')  # Remove the use_column_width=True
 
 
 if __name__ == '__main__':
