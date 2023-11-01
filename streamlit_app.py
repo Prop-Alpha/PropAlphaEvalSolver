@@ -125,9 +125,8 @@ def run():
                 """
             )
 
-        # --- Main Elements --- #
-
-        col1, col2, col3 = st.columns([0.14, 0.72, 0.14])
+        # --- Top of Page Elements --- #
+        col1, col2, col3 = st.columns([0.15, 0.70, 0.15])
 
         with col1:
             st.write("")
@@ -135,7 +134,7 @@ def run():
         with col2:
             st.markdown(
                 '<a href="https://www.prop-alpha.com/" target="_blank">'
-                '<img src="./app/static/propalpha_banner.png" width="715">'
+                '<img src="./app/static/propalpha_banner.png" width="735">'
                 '</a>',
                 unsafe_allow_html=True,
             )
@@ -186,9 +185,6 @@ def run():
     with col2:
         st.subheader('Results')
         if compute_button:
-            # Reserve a spot for our status message
-            status_message = st.empty()
-
             # Check if individual variables are defined and non-negative
             individual_vars_valid = all(
                 [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
@@ -230,13 +226,13 @@ def run():
             st.markdown("##")
             st.markdown("##")
 
-            # Outside of the column containers:
-            if (
-                    compute_button and sim.pct_wins > 0) and selected_game_preset != 'Combine Only':  # Make sure you have winners before plotting
+            # Visualization only works for 'Combine Only'
+            # and strategies with pct_wins > 0
+            if (compute_button and sim.pct_wins > 0) and selected_game_preset != 'Combine Only':
                 # After running the simulation, plot outcomes
                 buf = sim.plot_outcomes()
                 image = Image.open(buf)
-                st.image(image, caption='Simulation Outcomes')  # Remove the use_column_width=True
+                st.image(image, caption='Simulation Outcomes')
 
 
 if __name__ == '__main__':
