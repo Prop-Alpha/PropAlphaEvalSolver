@@ -229,7 +229,7 @@ class Simulation:
             "Percent Wins (Full Payout)": f"{self.pct_wins:.2f}%"
         }
 
-    def plot_outcomes(self):
+    def plot_outcomes(self, title):
         # Store the equity curve for this simulation along with its color
         # Plot each equity curve with the computed y-axis limits
         # Compute y-axis limits for the plots
@@ -252,7 +252,7 @@ class Simulation:
         plt.ylim(min_value, max_value)
         plt.xlabel('Number of Days Traded')
         plt.ylabel('Account Balance')
-        plt.title('Topstep 150k Account Simulation')
+        plt.title(title)
         plt.legend(loc='upper right')
         # plt.show()  # display the plot once after all curves have been plotted
         # TODO: hockey stick plot, histogram (condition on win?)

@@ -230,7 +230,7 @@ def run():
             # and strategies with pct_wins > 0
             if (compute_button and sim.pct_wins > 0) and selected_game_preset != 'Combine Only':
                 # After running the simulation, plot outcomes
-                buf = sim.plot_outcomes()
+                buf = sim.plot_outcomes(selected_acct_preset)
                 image = Image.open(buf)
                 st.image(image, caption='Simulation Outcomes')
 
