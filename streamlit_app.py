@@ -11,6 +11,7 @@ st.set_page_config(layout="wide",
                    page_icon="./app/static/favicon.ico",
                    page_title="Prop Alpha Eval Solver")
 
+
 account_rule_presets = {
     "Topstep 50k": {'Initial Balance (Eval)': 50000,
                     'Initial Balance (Funded)': 50000,
@@ -224,8 +225,7 @@ def run():
         # --- Results Elements --- #
         with col3:
             # Add vertical padding to align with dataframe results
-            st.markdown("##")
-            st.markdown("##")
+            st.markdown('&nbsp;', unsafe_allow_html=True)
 
             # Visualization only works for 'Combine Only'
             # and strategies with pct_wins > 0
