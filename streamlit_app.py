@@ -181,46 +181,47 @@ def run():
 
             compute_button = st.button("Compute Results")
 
-    # --- Computation Elements --- #
-    with col2:
-        st.subheader('Results')
-        if compute_button:
-            # Check if individual variables are defined and non-negative
-            individual_vars_valid = all(
-                [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
+        # --- Computation Elements --- #
+        with col2:
+            st.subheader('Results')
+            if compute_button:
+                # Check if individual variables are defined and non-negative
+                individual_vars_valid = all(
+                    [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
 
-            # Check if dictionaries are not empty and contain only non-negative values
-            dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
+                # Check if dictionaries are not empty and contain only non-negative values
+                dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
 
-            # If all checks pass, perform the computation
-            if individual_vars_valid and dict_values_non_negative and rules and fees:
+                # If all checks pass, perform the computation
+                if individual_vars_valid and dict_values_non_negative and rules and fees:
 
-                with st.spinner('Computing... Please wait.'):
-                    strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
-                                               stop_width=stop_width, tp_width=tp_width)
-                    sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
-                                     acct_rules=rules, acct_fees=fees)
-                    if selected_game_preset == 'Combine + Funded':
-                        sim.run()
-                        result = sim.sim_results()
-                    elif selected_game_preset == 'Combine Only':
-                        sim.run_eval_only()
-                        result = sim.eval_only_sim_results()
-                    else:
-                        sim.run_funded_only()
-                        result = sim.funded_only_sim_results()
+                    with st.spinner('Computing... Please wait.'):
+                        strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
+                                                   stop_width=stop_width, tp_width=tp_width)
+                        sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
+                                         acct_rules=rules, acct_fees=fees)
+                        if selected_game_preset == 'Combine + Funded':
+                            sim.run()
+                            result = sim.sim_results()
+                        elif selected_game_preset == 'Combine Only':
+                            sim.run_eval_only()
+                            result = sim.eval_only_sim_results()
+                        else:
+                            sim.run_funded_only()
+                            result = sim.funded_only_sim_results()
 
-                if isinstance(result, dict):
-                    df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
-                    # Calculate the height
-                    height = (len(df_result) + 1) * 35 + 3
-                    st.dataframe(df_result,
-                                 height=height,
-                                 use_container_width=True,
-                                 hide_index=True)
-            else:
-                st.warning("Please ensure all input values are provided and non-negative before computing.")
+                    if isinstance(result, dict):
+                        df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
+                        # Calculate the height
+                        height = (len(df_result) + 1) * 35 + 3
+                        st.dataframe(df_result,
+                                     height=height,
+                                     use_container_width=True,
+                                     hide_index=True)
+                else:
+                    st.warning("Please ensure all input values are provided and non-negative before computing.")
 
+        # --- Results Elements --- #
         with col3:
             # Add vertical padding to align with dataframe results
             st.markdown("##")
