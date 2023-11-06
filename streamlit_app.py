@@ -190,9 +190,21 @@ def run():
             results_placeholder = st.empty()
 
             # Set up an empty DataFrame structure to match expected results
-            df_empty = pd.DataFrame(columns=["Key", "Value"])
+            df_empty = pd.DataFrame(columns=["Parameter", "Result"])
             # Display the empty DataFrame as a placeholder
-            results_placeholder.dataframe(df_empty)
+            results_placeholder.dataframe(df_empty,
+                                          use_container_width=True,
+                                          hide_index=True,
+                                          column_config={
+                                              "Key": st.column_config.TextColumn(
+                                                  "Parameter",
+                                                  width="medium"
+                                              ),
+                                              "Value": st.column_config.TextColumn(
+                                                  "Result",
+                                                  width="small"
+                                              )
+                                          })
 
             if compute_button:
                 # Check if individual variables are defined and non-negative
@@ -224,10 +236,22 @@ def run():
                         df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
                         # Calculate the height
                         height = (len(df_result) + 1) * 35 + 3
-                        results_placeholder.dataframe(df_result,
-                                                      height=height,
-                                                      use_container_width=True,
-                                                      hide_index=True)
+                        results_placeholder.dataframe(
+                            df_result,
+                            height=height,
+                            use_container_width=True,
+                            hide_index=True,
+                            column_config={
+                                "Key": st.column_config.TextColumn(
+                                    "Parameter",
+                                    width="medium"
+                                ),
+                                "Value": st.column_config.TextColumn(
+                                    "Result",
+                                    width="small"
+                                )
+                            }
+                        )
                 else:
                     st.warning("Please ensure all input values are provided and non-negative before computing.")
 
