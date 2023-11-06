@@ -185,6 +185,15 @@ def run():
         # --- Computation Elements --- #
         with col2:
             st.subheader('Results')
+
+            # Placeholder for the DataFrame
+            results_placeholder = st.empty()
+
+            # Set up an empty DataFrame structure to match expected results
+            df_empty = pd.DataFrame(columns=["Key", "Value"])
+            # Display the empty DataFrame as a placeholder
+            results_placeholder.dataframe(df_empty)
+
             if compute_button:
                 # Check if individual variables are defined and non-negative
                 individual_vars_valid = all(
@@ -215,10 +224,10 @@ def run():
                         df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
                         # Calculate the height
                         height = (len(df_result) + 1) * 35 + 3
-                        st.dataframe(df_result,
-                                     height=height,
-                                     use_container_width=True,
-                                     hide_index=True)
+                        results_placeholder.dataframe(df_result,
+                                                      height=height,
+                                                      use_container_width=True,
+                                                      hide_index=True)
                 else:
                     st.warning("Please ensure all input values are provided and non-negative before computing.")
 
