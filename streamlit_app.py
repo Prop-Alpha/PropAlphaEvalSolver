@@ -11,6 +11,7 @@ st.set_page_config(layout="wide",
                    page_icon="./app/static/favicon.ico",
                    page_title="Prop Alpha Eval Solver")
 
+
 account_rule_presets = {
     "Topstep 50k": {'Initial Balance (Eval)': 50000,
                     'Initial Balance (Funded)': 50000,
@@ -181,50 +182,83 @@ def run():
 
             compute_button = st.button("Compute Results")
 
-    # --- Computation Elements --- #
-    with col2:
-        st.subheader('Results')
-        if compute_button:
-            # Check if individual variables are defined and non-negative
-            individual_vars_valid = all(
-                [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
+        # --- Computation Elements --- #
+        with col2:
+            st.subheader('Results')
 
-            # Check if dictionaries are not empty and contain only non-negative values
-            dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
+            # Placeholder for the DataFrame
+            results_placeholder = st.empty()
 
-            # If all checks pass, perform the computation
-            if individual_vars_valid and dict_values_non_negative and rules and fees:
+            # Set up an empty DataFrame structure to match expected results
+            df_empty = pd.DataFrame(columns=["Parameter", "Result"])
+            # Display the empty DataFrame as a placeholder
+            results_placeholder.dataframe(df_empty,
+                                          use_container_width=True,
+                                          hide_index=True,
+                                          column_config={
+                                              "Key": st.column_config.TextColumn(
+                                                  "Parameter",
+                                                  width="medium"
+                                              ),
+                                              "Value": st.column_config.TextColumn(
+                                                  "Result",
+                                                  width="small"
+                                              )
+                                          })
 
-                with st.spinner('Computing... Please wait.'):
-                    strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
-                                               stop_width=stop_width, tp_width=tp_width)
-                    sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
-                                     acct_rules=rules, acct_fees=fees)
-                    if selected_game_preset == 'Combine + Funded':
-                        sim.run()
-                        result = sim.sim_results()
-                    elif selected_game_preset == 'Combine Only':
-                        sim.run_eval_only()
-                        result = sim.eval_only_sim_results()
-                    else:
-                        sim.run_funded_only()
-                        result = sim.funded_only_sim_results()
+            if compute_button:
+                # Check if individual variables are defined and non-negative
+                individual_vars_valid = all(
+                    [var is not None and var >= 0 for var in [win_pct, mfe, trades_per_day, stop_width, tp_width]])
 
-                if isinstance(result, dict):
-                    df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
-                    # Calculate the height
-                    height = (len(df_result) + 1) * 35 + 3
-                    st.dataframe(df_result,
-                                 height=height,
-                                 use_container_width=True,
-                                 hide_index=True)
-            else:
-                st.warning("Please ensure all input values are provided and non-negative before computing.")
+                # Check if dictionaries are not empty and contain only non-negative values
+                dict_values_non_negative = all([all(val >= 0 for val in d.values()) for d in [rules, fees]])
 
+                # If all checks pass, perform the computation
+                if individual_vars_valid and dict_values_non_negative and rules and fees:
+
+                    with st.spinner('Computing... Please wait.'):
+                        strategy = TradingStrategy(odds=win_pct, mfe=mfe, trades_per_day=trades_per_day,
+                                                   stop_width=stop_width, tp_width=tp_width)
+                        sim = Simulation(trading_strat=strategy, num_traders=int(monte_carlo_runs),
+                                         acct_rules=rules, acct_fees=fees)
+                        if selected_game_preset == 'Combine + Funded':
+                            sim.run()
+                            result = sim.sim_results()
+                        elif selected_game_preset == 'Combine Only':
+                            sim.run_eval_only()
+                            result = sim.eval_only_sim_results()
+                        else:
+                            sim.run_funded_only()
+                            result = sim.funded_only_sim_results()
+
+                    if isinstance(result, dict):
+                        df_result = pd.DataFrame(list(result.items()), columns=["Key", "Value"])
+                        # Calculate the height
+                        height = (len(df_result) + 1) * 35 + 3
+                        results_placeholder.dataframe(
+                            df_result,
+                            height=height,
+                            use_container_width=True,
+                            hide_index=True,
+                            column_config={
+                                "Key": st.column_config.TextColumn(
+                                    "Parameter",
+                                    width="medium"
+                                ),
+                                "Value": st.column_config.TextColumn(
+                                    "Result",
+                                    width="small"
+                                )
+                            }
+                        )
+                else:
+                    st.warning("Please ensure all input values are provided and non-negative before computing.")
+
+        # --- Results Elements --- #
         with col3:
             # Add vertical padding to align with dataframe results
-            st.markdown("##")
-            st.markdown("##")
+            st.markdown('&nbsp;', unsafe_allow_html=True)
 
             # Visualization only works for 'Combine Only'
             # and strategies with pct_wins > 0
