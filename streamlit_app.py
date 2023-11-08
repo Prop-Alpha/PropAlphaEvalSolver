@@ -72,7 +72,7 @@ cost_fee_preset = {
         "Per Side Trade Cost": 0,
         "Trade Entry Slippage": 0,
         "Trade Stop Slippage": 0,
-        "Monthly Funded Account Cost": 0
+        "Monthly Eval Cost": 149
     },
     "Custom...": {
         "Eval Acct Cost": 0,
@@ -80,7 +80,7 @@ cost_fee_preset = {
         "Per Side Trade Cost": 0,
         "Trade Entry Slippage": 0,
         "Trade Stop Slippage": 0,
-        "Monthly Funded Account Cost": 0
+        "Monthly Eval Cost": 0
     }
 }
 

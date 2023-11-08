@@ -16,9 +16,9 @@ class Trader:
 
     def trade_for_day(self):
         finished_day_without_stop_condition = True
-        if (self.account.total_days // 30) > self.months_traded:
+        if ((self.account.total_days // 30) > self.months_traded) and self.account.in_eval:
             self.months_traded += 1
-            self.PnL -= self.fees['Monthly Funded Account Cost']
+            self.PnL -= self.fees['Monthly Eval Cost']
         for i in range(self.strategy.trades_per_day):
             trade_return = self.strategy.simulate_return(self.per_side_cost, self.entry_slippage, self.stop_slippage)
             sim_mfe = 0
